@@ -1,0 +1,14 @@
+{
+  "name": "revelio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "check": "node scripts/check.cjs",
+    "test:unit": "node --test tests/unit/*.test.cjs",
+    "test:browser": "playwright test",
+    "test": "npm run check && npm run test:unit && npm run test:browser"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1"
+  }
+}

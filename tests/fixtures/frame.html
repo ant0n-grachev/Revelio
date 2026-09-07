@@ -1,0 +1,15 @@
+<!doctype html><html><meta charset="utf-8"><title>Frame fixture</title>
+<style>html,body{background:white;color:black;font:16px Arial}</style>
+<body><p id="secret" style="color:transparent"></p><script>
+const values = new URLSearchParams(location.search);
+document.getElementById('secret').textContent = `Frame ${values.get('name')} secret`;
+const host = document.createElement('div');
+host.id = 'same-host';
+document.body.append(host);
+host.attachShadow({mode:'open'}).innerHTML = '<span id="secret" style="color:transparent">Frame shadow secret</span>';
+if (values.has('nested')) {
+  const nested = document.createElement('iframe');
+  nested.src = '/frame?name=nested-frame';
+  document.body.append(nested);
+}
+</script>
