@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Revelio regression fixtures</title>
+<style>html,body{background:white;color:black;font:16px Arial;margin:8px}p{margin:5px}</style>
+<body><main id="fixture"></main>
+<script>
+const parameters = new URLSearchParams(location.search);
+const fixture = document.getElementById('fixture');
+const add = (html, parent = fixture) => {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  parent.append(template.content);
+};
+const ready = [];
+function frame(parent, url, sandbox) {
+  const element = document.createElement('iframe');
+  element.id = 'same-frame';
+  if (sandbox !== undefined) element.setAttribute('sandbox', sandbox);
+  ready.push(new Promise(resolve => element.onload = resolve));
+  element.src = url;
+  parent.append(element);
+  return element;
+}
+function shadow(parent, text) {
+  const host = document.createElement('div');
+  host.id = 'same-host';
+  parent.append(host);
+  const root = host.attachShadow({ mode: 'open' });
+  add(`<span id="secret" style="color:transparent">${text}</span>`, root);
+  return root;
+}
+switch (parameters.get('case')) {
+  case 'starvation':
+    for (let i = 0; i < Number(parameters.get('count') || 800); i++) add(`<label style="display:none">Hidden label ${i}</label>`);
+    add('<p id="late" style="color:transparent">Late transparent priority finding</p>');
+    break;
+  case 'retention':
+    for (let i = 0; i < 900; i++) add(`<p style="opacity:0">Lower priority candidate ${i}</p>`);
+    add('<p id="late" style="font-size:1px;color:transparent;position:absolute;top:-10000px">Late highest priority finding</p>');
+    break;
+  case 'roots': {
+    const one = shadow(fixture, 'Shadow one secret');
+    shadow(fixture, 'Shadow two secret');
+    const nested = shadow(one, 'Nested shadow secret');
+    frame(nested, '/frame?name=shadow-frame');
+    frame(fixture, '/frame?name=frame-one&nested=1');
+    frame(fixture, '/frame?name=frame-two');
+    break;
+  }
+  case 'collision':
+    add('<style>#htd-panel{display:none!important}.htd-highlight{outline:3px solid green}</style><aside id="htd-panel" data-page="owned">Page-owned content</aside><p id="page-mark" class="htd-highlight" data-htd-mark="page">Page-owned mark</p>');
+    add('<p id="literal" style="color:transparent"></p>');
+    document.getElementById('literal').textContent = '<img src=x onerror="window.__executed=true"> literal finding';
+    break;
+  case 'colors':
+    add('<p id="same" style="font-size:16px;color:white;background:white">Same color ordinary size</p><p id="same-modern" style="font-size:16px;color:oklch(100% 0 0);background:oklch(100% 0 0)">Modern same color ordinary size</p><p id="rgb" style="font-size:12px;color:rgb(255,255,255);background:rgb(0,0,0)">Readable RGB white black</p><p id="modern" style="font-size:12px;color:oklch(100% 0 0);background:oklch(0% 0 0)">Readable modern white black</p><div style="background:black"><p id="ancestor" style="color:black;background:transparent">Same color ancestor background</p></div><p id="alpha" style="color:rgba(0,0,0,0.01)">Transparent alpha text</p><p id="unknown" style="background-image:linear-gradient(white,black);color:white;font-size:12px">Unknown effective gradient background</p>');
+    break;
+  case 'vertical':
+    add('<p id="vertical" style="position:absolute;top:-10000px;left:0">Extreme vertical displacement</p><p id="horizontal" style="position:absolute;left:-10000px;top:0">Extreme horizontal displacement</p><div style="height:12000px"></div><p id="below">Ordinary below fold text</p>');
+    break;
+  case 'positioned-ancestors':
+    add('<p id="relative" style="position:relative;top:-10000px">Relative vertical displacement</p><div style="position:absolute;top:-10000px"><span id="child">Ancestor vertical displacement</span></div><div id="pseudo-opacity" style="opacity:0"></div><style>#pseudo-opacity::before{content:"Host opacity pseudo secret"}</style>');
+    break;
+  case 'unicode':
+    add('<p id="emoji">👩‍💻</p><p id="sentence">I work as a developer 👩‍💻 every day.</p><p id="persian" lang="fa">من می‌روم خانه</p><p id="indic" lang="hi">क्‍ष और क्‌ष</p><p id="arabic" lang="ar">ب‍ب</p><p id="odd">Surprise\u200Bhidden\u2060word</p><p id="bidi">File\u202Etxt.exe\u202C</p>');
+    break;
+  case 'frames':
+    frame(fixture, '/frame?name=accessible');
+    frame(fixture, '/frame?name=opaque', '');
+    frame(fixture, `http://localhost:${location.port}/frame?name=cross-origin`);
+    break;
+  case 'large':
+    for (let i = 0; i < Number(parameters.get('count') || 100000); i++) add(`<span>Ordinary visible text ${i}</span>`);
+    break;
+  case 'smoke':
+    add('<aside id="htd-panel" data-page="owned">Page-owned content</aside><style>#htd-panel{display:none!important}</style><p id="smoke" style="color:transparent"></p>');
+    document.getElementById('smoke').textContent = '<img src=x onerror="window.__executed=true"> Actual extension secret';
+    shadow(fixture, 'Actual extension shadow secret');
+    frame(fixture, '/frame?name=actual-extension');
+    break;
+  default:
+    add('<p>Ordinary visible page text.</p>');
+}
+window.fixtureReady = Promise.all(ready);
+</script>

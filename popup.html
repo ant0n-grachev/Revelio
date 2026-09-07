@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Revelio report</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 12px; width: 390px; color: #202124; background: white; }
+      h1 { font-size: 18px; margin: 0 0 10px; }
+      button { padding: 9px; cursor: pointer; }
+      button:disabled { cursor: default; opacity: .55; }
+      select { width: 100%; padding: 8px; margin: 4px 0 8px; }
+      label { display: block; font-size: 12px; margin-top: 2px; }
+      .actions { display: flex; gap: 6px; margin: 6px 0; }
+      .actions button { flex: 1; }
+      #status { margin: 10px 0 6px; font-size: 13px; font-weight: 600; }
+      #coverage { font-size: 12px; line-height: 1.4; padding: 8px; background: #f1f3f4; border-radius: 4px; }
+      #coverage.warning { background: #fff0d3; color: #573d00; }
+      .small { font-size: 11px; line-height: 1.4; color: #555; }
+      #results { max-height: 360px; overflow: auto; padding-left: 24px; margin: 10px 0; }
+      #results > li { padding: 8px 0; border-top: 1px solid #ddd; }
+      .finding-title { font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
+      .snippet { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; margin: 6px 0; }
+      .reasons { font-size: 12px; padding-left: 18px; }
+      .locate { font-size: 11px; margin-top: 6px; padding: 5px 8px; }
+      details { margin: 8px 0; font-size: 11px; }
+      #roots { padding-left: 18px; max-height: 120px; overflow: auto; overflow-wrap: anywhere; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <h1>Revelio</h1>
+    <label for="tolerance">Tolerance</label>
+    <select id="tolerance">
+      <option value="everything">Everything</option>
+      <option value="sweep">Sweep</option>
+      <option value="default" selected>Default</option>
+      <option value="precise">Precise</option>
+    </select>
+    <div class="actions">
+      <button id="scan" type="button">Scan this page</button>
+      <button id="cancel" type="button" hidden>Cancel scan</button>
+    </div>
+    <div class="actions">
+      <button id="clear" type="button" disabled>Clear report &amp; highlights</button>
+      <button id="copy" type="button" disabled>Copy JSON</button>
+    </div>
+    <div id="status" role="status" aria-live="polite">Loading current report…</div>
+    <div id="coverage" hidden></div>
+    <details id="root-details" hidden>
+      <summary>Root coverage</summary>
+      <ul id="roots"></ul>
+    </details>
+    <ol id="results" aria-label="Scan findings"></ol>
+    <p class="small">Local only. Closing this popup lets a running scan finish. Reopen it on the same page to see its report. Clear, rescanning, navigation, reload, or an extension reload discards results.</p>
+    <p class="small">Coverage applies to accessible documents and open shadow roots. Closed shadow roots cannot reliably be enumerated. The webpage controls the DOM being scanned.</p>
+    <script src="protocol.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
