@@ -3,6 +3,7 @@
 
   const ui = Object.fromEntries([
     'scan', 'cancel', 'clear', 'copy', 'tolerance', 'status', 'coverage', 'results', 'roots', 'root-details',
+    'report-actions', 'coverage-note',
   ].map(id => [id, document.getElementById(id)]));
   let target = null;
   let current = null;
@@ -19,8 +20,11 @@
     ui.scan.disabled = busy;
     ui.cancel.hidden = current?.report.status !== 'running';
     ui.cancel.disabled = busy;
-    ui.clear.disabled = busy || !current || current.report.status === 'idle';
-    ui.copy.disabled = busy || !current || current.report.status === 'idle';
+    const hasReport = Boolean(current && current.report.status !== 'idle');
+    ui['report-actions'].hidden = !hasReport;
+    ui['coverage-note'].hidden = !hasReport;
+    ui.clear.disabled = busy || !hasReport;
+    ui.copy.disabled = busy || !hasReport;
   }
 
   function stopPolling() {
@@ -35,6 +39,7 @@
     target = null;
     busy = false;
     ui.results.replaceChildren();
+    ui.results.hidden = true;
     ui.roots.replaceChildren();
     ui.coverage.hidden = true;
     ui['root-details'].hidden = true;
@@ -123,7 +128,7 @@
     const coverage = report.coverage;
     const running = report.status === 'running';
     const findingsCount = counted(report.findings.length, 'finding');
-    if (report.status === 'idle') setStatus('Ready. Start a scan of this page.');
+    if (report.status === 'idle') setStatus('Ready to scan.');
     else if (running) setStatus(`Scanning (${report.mode})… ${findingsCount} retained so far.`);
     else if (report.status === 'cancelled') setStatus(`Scan cancelled. ${findingsCount} in the content inspected.`);
     else if (report.status === 'error') setStatus(`Scan failed: ${report.error || 'The page changed or scanning was interrupted.'}`);
@@ -132,34 +137,43 @@
 
     ui.coverage.hidden = report.status === 'idle';
     ui.coverage.classList.toggle('warning', !coverage.complete || coverage.skippedFrames > 0);
-    let description = running ? 'Scan in progress; coverage is partial.' :
-      coverage.complete ? 'All discovered accessible roots were scanned.' : 'Incomplete coverage.';
+    let description = running ? 'Coverage is partial while scanning.' :
+      coverage.complete ? 'Accessible roots scanned.' : 'Incomplete coverage.';
     if (coverage.stopReason) description += ` Stop reason: ${coverage.stopReason}.`;
-    if (coverage.skippedFrames) description += ` ${counted(coverage.skippedFrames, 'frame')} skipped and left uninspected.`;
+    if (coverage.skippedFrames) description += ` ${counted(coverage.skippedFrames, 'frame')} skipped.`;
     description += ` ${counted(coverage.visitedNodes, 'node')} visited in ${Math.round(coverage.elapsedMs)} ms.`;
-    if (coverage.omitted) description += ` ${counted(coverage.omitted, 'additional eligible finding')} omitted from the retained report; this result limit does not stop traversal.`;
+    if (coverage.omitted) description += ` ${counted(coverage.omitted, 'additional eligible finding')} omitted from the report.`;
     ui.coverage.textContent = description;
     ui['root-details'].hidden = coverage.roots.length === 0;
     const rootItems = coverage.roots.map(root => element('li',
       `${root.id} · ${root.source}: ${root.status}${root.detail ? ` — ${root.detail}` : ''}`));
     ui.roots.replaceChildren(...rootItems);
 
-    const findings = report.findings.map(finding => {
-      const item = element('li');
+    const findings = report.findings.map((finding, index) => {
+      const item = element('li', undefined, 'finding');
       item.dataset.findingId = finding.id;
-      item.append(element('div', `${finding.source} · ${finding.rootId} · ${finding.selector} · score ${finding.score}`, 'finding-title'));
+      item.append(element('div', `Finding ${index + 1}`, 'finding-title'));
       item.append(element('pre', finding.snippet, 'snippet'));
+
+      const footer = element('div', undefined, 'finding-footer');
+      const details = element('details', undefined, 'finding-details');
+      details.append(element('summary', 'Evidence'));
+      details.append(element('p', `Score ${finding.score} · ${finding.source}`));
+      details.append(element('p', `${finding.rootId} · ${finding.selector}`));
       const reasons = element('ul', undefined, 'reasons');
       reasons.append(...finding.reasons.map(reason => element('li', reason)));
-      item.append(reasons);
+      details.append(reasons);
+
       const locate = element('button', 'Locate on page', 'locate');
       locate.type = 'button';
       locate.disabled = running;
       locate.addEventListener('click', () => locateFinding(envelope, finding.id));
-      item.append(locate);
+      footer.append(details, locate);
+      item.append(footer);
       return item;
     });
     ui.results.replaceChildren(...findings);
+    ui.results.hidden = findings.length === 0;
     updateActions();
   }
 

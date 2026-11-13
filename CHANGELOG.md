@@ -4,7 +4,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## Unreleased
 
-The source prepares `v1.0.2`.
+The source prepares `v1.0.3`.
 
 ### Added
 
@@ -13,8 +13,10 @@ The source prepares `v1.0.2`.
 
 ### Changed
 
+- Simplified the popup with one primary scan action and expandable finding evidence.
 - Simplified the icon and added dedicated toolbar sizes for better visibility.
 - Updated the screenshots with real scans of local demo pages.
+- Moved the privacy policy to the repository and redirected the previous policy URL.
 - Clarified installation, permissions, coverage limits, and verification in the README and linked documentation.
 
 ### Fixed

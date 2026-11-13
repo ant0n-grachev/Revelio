@@ -10,9 +10,9 @@ Web reviewers and people checking pages used by AI assistants can scan the activ
 
 Install Revelio from the [Chrome Web Store](https://chromewebstore.google.com/detail/revelio/hdcjpjjfangdnigmhdnnmhndanhejeem), or follow the setup below to try the current source.
 
-![Revelio showing two hidden-text findings and their locations on a local demo page](docs/extension-findings.jpg)
+<a href="docs/extension-findings.jpg"><img src="docs/extension-findings.jpg" width="480" alt="Revelio showing two hidden-text findings and their locations on a local demo page"></a>
 
-[See the incomplete-coverage example](docs/extension-coverage.jpg).
+<a href="docs/extension-coverage.jpg"><img src="docs/extension-coverage.jpg" width="480" alt="Revelio showing an incomplete-coverage warning for a skipped frame on a local demo page"></a>
 
 ## Features
 
@@ -42,7 +42,7 @@ cd Revelio
 
 1. Open `chrome://extensions`, enable **Developer mode**, and select **Load unpacked**. Choose the cloned `Revelio` folder.
 2. Open a regular webpage, click Revelio in the toolbar, and select **Scan this page**.
-3. Review the report and coverage warning. Use **Locate on page**, **Copy JSON**, or **Clear report & highlights** as needed.
+3. Review the findings and any coverage warning. Expand **Evidence** for details or select **Locate on page** to highlight a finding. Use **Copy JSON** to export the report or **Clear report** to remove the report and highlights.
 
 ## Configuration
 
@@ -74,6 +74,6 @@ Findings are heuristics and can include legitimate accessibility text or hidden 
 
 ## Versioning and credits
 
-This source prepares the `v1.0.2` patch. The application version lives in `manifest.json` and is mirrored in `package.json` and `package-lock.json`. Versions follow [Semantic Versioning](https://semver.org/), with `vX.Y.Z` used in release labels. See the [changelog](CHANGELOG.md).
+This source prepares the `v1.0.3` patch. The application version lives in `manifest.json` and is mirrored in `package.json` and `package-lock.json`. Versions follow [Semantic Versioning](https://semver.org/), with `vX.Y.Z` used in release labels. See the [changelog](CHANGELOG.md).
 
 Created by Anton Grachev and distributed under the [MIT license](LICENSE). Use [GitHub Issues](https://github.com/ant0n-grachev/Revelio/issues) to report a bug with a minimal, non-sensitive example.

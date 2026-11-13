@@ -1,59 +1,154 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Revelio report</title>
-    <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 12px; width: 390px; color: #202124; background: white; }
-      h1 { font-size: 18px; margin: 0 0 10px; }
-      button { padding: 9px; cursor: pointer; }
-      button:disabled { cursor: default; opacity: .55; }
-      select { width: 100%; padding: 8px; margin: 4px 0 8px; }
-      label { display: block; font-size: 12px; margin-top: 2px; }
-      .actions { display: flex; gap: 6px; margin: 6px 0; }
-      .actions button { flex: 1; }
-      #status { margin: 10px 0 6px; font-size: 13px; font-weight: 600; }
-      #coverage { font-size: 12px; line-height: 1.4; padding: 8px; background: #f1f3f4; border-radius: 4px; }
-      #coverage.warning { background: #fff0d3; color: #573d00; }
-      .small { font-size: 11px; line-height: 1.4; color: #555; }
-      #results { max-height: 360px; overflow: auto; padding-left: 24px; margin: 10px 0; }
-      #results > li { padding: 8px 0; border-top: 1px solid #ddd; }
-      .finding-title { font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
-      .snippet { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; margin: 6px 0; }
-      .reasons { font-size: 12px; padding-left: 18px; }
-      .locate { font-size: 11px; margin-top: 6px; padding: 5px 8px; }
-      details { margin: 8px 0; font-size: 11px; }
-      #roots { padding-left: 18px; max-height: 120px; overflow: auto; overflow-wrap: anywhere; }
-      [hidden] { display: none !important; }
-    </style>
-  </head>
-  <body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Revelio</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: #f7f8fb;
+      --surface: #fff;
+      --text: #17213a;
+      --muted: #526078;
+      --border: #dce1eb;
+      --accent: #ffcf64;
+      --on-accent: #272011;
+      --focus: #775100;
+      --warning-bg: #fff0d0;
+      --warning-text: #694800;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: #101624;
+        --surface: #1b2435;
+        --text: #edf1fa;
+        --muted: #b8c3d7;
+        --border: #3a4860;
+        --focus: #ffd574;
+        --warning-bg: #382b14;
+        --warning-text: #ffe19b;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      width: 368px;
+      margin: 0;
+      padding: 15px;
+      background: var(--background);
+      color: var(--text);
+      font: 13px/1.45 system-ui, -apple-system, sans-serif;
+    }
+
+    .brand { display: flex; align-items: center; gap: 7px; margin-bottom: 12px; }
+    .brand img { display: block; }
+    h1 { margin: 0; font-size: 20px; line-height: 1.15; letter-spacing: -.025em; }
+
+    .controls, .finding {
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--surface);
+    }
+    .controls { display: grid; gap: 9px; padding: 10px; }
+    .tolerance { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    label { font-weight: 600; }
+    button, select {
+      min-height: 31px;
+      padding: 4px 9px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+    }
+    button { cursor: pointer; font-weight: 600; }
+    button:disabled { cursor: default; opacity: .55; }
+    :is(button, select, summary):focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+    .actions { display: flex; gap: 6px; }
+    .actions > button { flex: 1; }
+    #scan { background: var(--accent); border-color: transparent; color: var(--on-accent); }
+    #report-actions button { font-size: 12px; }
+    #status { margin: 10px 1px 0; font-weight: 600; overflow-wrap: anywhere; }
+
+    #coverage {
+      margin-top: 7px;
+      padding: 7px 9px;
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    #coverage.warning { background: var(--warning-bg); color: var(--warning-text); }
+    details { color: var(--muted); font-size: 12px; }
+    summary { cursor: pointer; }
+    #root-details { margin: 7px 1px 0; }
+    #roots { max-height: 100px; margin: 4px 0 0; padding-inline-start: 20px; overflow: auto; overflow-wrap: anywhere; }
+
+    #results {
+      display: grid;
+      gap: 6px;
+      max-height: 295px;
+      overflow: auto;
+      margin: 8px 0 0;
+      padding: 2px;
+      list-style: none;
+    }
+    .finding { min-width: 0; padding: 9px; overflow-wrap: anywhere; }
+    .finding-title { color: var(--muted); font-size: 11px; font-weight: 650; }
+    .snippet {
+      margin: 3px 0 6px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font: inherit;
+    }
+    .finding-footer { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .finding-details { flex: 1; min-width: 0; padding-top: 4px; }
+    .finding-details p { margin: 4px 0 0; }
+    .reasons { margin: 4px 0 0; padding-inline-start: 16px; }
+    .locate { flex-shrink: 0; min-height: 27px; padding: 3px 7px; font-size: 11px; }
+    #coverage-note { margin: 7px 1px 0; color: var(--muted); font-size: 11px; }
+  </style>
+</head>
+<body>
+  <header class="brand">
+    <img src="icon32.png" width="22" height="22" alt="">
     <h1>Revelio</h1>
-    <label for="tolerance">Tolerance</label>
-    <select id="tolerance">
-      <option value="everything">Everything</option>
-      <option value="sweep">Sweep</option>
-      <option value="default" selected>Default</option>
-      <option value="precise">Precise</option>
-    </select>
+  </header>
+  <div class="controls">
+    <div class="tolerance">
+      <label for="tolerance">Tolerance</label>
+      <select id="tolerance">
+        <option value="everything">Everything</option>
+        <option value="sweep">Sweep</option>
+        <option value="default" selected>Default</option>
+        <option value="precise">Precise</option>
+      </select>
+    </div>
     <div class="actions">
       <button id="scan" type="button">Scan this page</button>
       <button id="cancel" type="button" hidden>Cancel scan</button>
     </div>
-    <div class="actions">
-      <button id="clear" type="button" disabled>Clear report &amp; highlights</button>
+    <div id="report-actions" class="actions" hidden>
+      <button id="clear" type="button" disabled>Clear report</button>
       <button id="copy" type="button" disabled>Copy JSON</button>
     </div>
-    <div id="status" role="status" aria-live="polite">Loading current report…</div>
-    <div id="coverage" hidden></div>
-    <details id="root-details" hidden>
-      <summary>Root coverage</summary>
-      <ul id="roots"></ul>
-    </details>
-    <ol id="results" aria-label="Scan findings"></ol>
-    <p class="small">Local only. Closing this popup lets a running scan finish. Reopen it on the same page to see its report. Clear, rescanning, navigation, reload, or an extension reload discards results.</p>
-    <p class="small">Coverage applies to accessible documents and open shadow roots. Closed shadow roots cannot reliably be enumerated. The webpage controls the DOM being scanned.</p>
-    <script src="protocol.js"></script>
-    <script src="popup.js"></script>
-  </body>
+  </div>
+  <div id="status" role="status">Loading…</div>
+  <div id="coverage" hidden></div>
+  <details id="root-details" hidden>
+    <summary>Root coverage</summary>
+    <ul id="roots"></ul>
+  </details>
+  <ol id="results" aria-label="Scan findings" role="list" hidden></ol>
+  <p id="coverage-note" hidden>Scans run locally and cover accessible content.</p>
+  <script src="protocol.js"></script>
+  <script src="popup.js"></script>
+</body>
 </html>

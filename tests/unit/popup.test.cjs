@@ -25,7 +25,7 @@ class Node {
 }
 
 function harness(initial = report()) {
-  const nodes = Object.fromEntries(['scan', 'cancel', 'clear', 'copy', 'tolerance', 'status', 'coverage', 'results', 'roots', 'root-details'].map(id => [id, new Node(id)]));
+  const nodes = Object.fromEntries(['scan', 'cancel', 'clear', 'copy', 'tolerance', 'status', 'coverage', 'results', 'roots', 'root-details', 'report-actions', 'coverage-note'].map(id => [id, new Node(id)]));
   const activated = new Set(); const updated = new Set(); const lifecycle = new Map();
   const event = listeners => ({ addListener: callback => listeners.add(callback), removeListener: callback => listeners.delete(callback) });
   let latest = initial; let active = { id: 1, url: 'https://example.test/', status: 'complete' };
