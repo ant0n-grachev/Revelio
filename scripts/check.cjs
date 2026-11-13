@@ -4,6 +4,14 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json'), 'utf8'));
+const packageMetadata = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+const lockfile = JSON.parse(fs.readFileSync(path.join(root, 'package-lock.json'), 'utf8'));
+assert.match(manifest.version, /^(?:0|[1-9]\d{0,4})(?:\.(?:0|[1-9]\d{0,4})){2}$/, 'Use a three-part Chrome extension version');
+assert.notEqual(manifest.version, '0.0.0', 'Chrome extension versions must be nonzero');
+assert(manifest.version.split('.').every(part => Number(part) <= 65535), 'Chrome version components must be at most 65535');
+assert.equal(packageMetadata.version, manifest.version, 'package.json version must match manifest.json');
+assert.equal(lockfile.version, manifest.version, 'package-lock.json version must match manifest.json');
+assert.equal(lockfile.packages?.['']?.version, manifest.version, 'package-lock.json root package version must match manifest.json');
 assert.equal(manifest.manifest_version, 3);
 assert.deepEqual(manifest.permissions, ['activeTab', 'scripting']);
 assert.equal(manifest.host_permissions, undefined);
@@ -18,4 +26,4 @@ for (const file of packagedFiles) {
 }
 const popup = fs.readFileSync(path.join(root, manifest.action.default_popup), 'utf8');
 for (const match of popup.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)) assert(packagedFiles.includes(match[1]), `Unpackaged popup script: ${match[1]}`);
-console.log(`Syntax and extension packaging checks passed (${packagedFiles.length} required files; original permissions unchanged).`);
+console.log(`Syntax and extension packaging checks passed (${packagedFiles.length} required files; version ${manifest.version}; original permissions unchanged).`);
