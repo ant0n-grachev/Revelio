@@ -16,7 +16,7 @@ assert.equal(manifest.manifest_version, 3);
 assert.deepEqual(manifest.permissions, ['activeTab', 'scripting']);
 assert.equal(manifest.host_permissions, undefined);
 assert.equal(manifest.content_scripts, undefined);
-const packagedFiles = ['manifest.json', 'content.js', 'detection.js', 'retention.js', 'protocol.js', 'popup.js', 'popup.html', 'privacy.html', ...Object.values(manifest.icons)];
+const packagedFiles = ['manifest.json', 'content.js', 'detection.js', 'retention.js', 'protocol.js', 'popup.js', 'popup.html', ...Object.values(manifest.icons)];
 for (const file of packagedFiles) {
   assert(fs.statSync(path.join(root, file)).isFile(), `Missing packaged file: ${file}`);
   if (file.endsWith('.js')) {

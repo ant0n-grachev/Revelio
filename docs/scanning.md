@@ -48,7 +48,7 @@ Permissions remain **`activeTab`** and **`scripting`** only. Access follows a us
 
 The latest report and finding references stay only in the current document's content-script memory. Closing the popup lets a running scan finish; reopening it on the same document retrieves that report. Clear, a new scan, navigation (including entry to the back/forward cache), or a page reload discards it. Different tabs have separate reports. Extension reload/update invalidates access to existing content-script state; reload the webpage if stale decorative highlights remain or messaging fails. Browser process termination also loses reports. Reports are not written to extension storage. Only the selected tolerance is saved locally; JSON reaches the clipboard only when requested.
 
-See [privacy.html](../privacy.html).
+See the [privacy policy](../PRIVACY.md).
 
 ## Development and verification
 
@@ -77,7 +77,7 @@ npm run test:browser
 
 Browser fixtures use port **4179** with `127.0.0.1` and `localhost` as distinct origins for real same-origin/cross-origin cases. The suite includes default-budget fixtures plus reduced work limits in explicitly instrumented test copies for deterministic boundary tests; no test controls are exposed by the shipped scanner. Traces/screenshots on failure can contain fixture text. CI runs the same checks under Xvfb and uploads failure artifacts.
 
-For an unpacked installation, only `manifest.json`, `icon128.png`, `popup.html`, `popup.js`, `protocol.js`, `content.js`, `detection.js`, `retention.js`, and `privacy.html` are needed. `npm run check` verifies these files, JavaScript syntax, packaged popup scripts, the permission list, and version consistency between the Chrome manifest and both npm metadata files. There is no production build step.
+For an unpacked installation, only `manifest.json`, the icon PNGs, `popup.html`, `popup.js`, `protocol.js`, `content.js`, `detection.js`, and `retention.js` are needed. `npm run check` verifies these files, JavaScript syntax, packaged popup scripts, the permission list, and version consistency between the Chrome manifest and both npm metadata files. There is no production build step.
 
 ## Implementation and evidence
 

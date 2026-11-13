@@ -4,7 +4,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## Unreleased
 
-The source prepares `v1.0.1`.
+The source prepares `v1.0.2`.
 
 ### Added
 
@@ -13,6 +13,8 @@ The source prepares `v1.0.1`.
 
 ### Changed
 
+- Simplified the icon and added dedicated toolbar sizes for better visibility.
+- Updated the screenshots with real scans of local demo pages.
 - Clarified installation, permissions, coverage limits, and verification in the README and linked documentation.
 
 ### Fixed

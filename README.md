@@ -8,9 +8,11 @@ Web reviewers and people checking pages used by AI assistants can scan the activ
 
 ## Installation
 
-Install the published `v1.0.0` build from the [Chrome Web Store](https://chromewebstore.google.com/detail/revelio/hdcjpjjfangdnigmhdnnmhndanhejeem), or follow the setup below to try the current source.
+Install Revelio from the [Chrome Web Store](https://chromewebstore.google.com/detail/revelio/hdcjpjjfangdnigmhdnnmhndanhejeem), or follow the setup below to try the current source.
 
-![Revelio popup showing a hidden-text finding and an incomplete coverage warning on a local test page](docs/extension-report.png)
+![Revelio showing two hidden-text findings and their locations on a local demo page](docs/extension-findings.jpg)
+
+[See the incomplete-coverage example](docs/extension-coverage.jpg).
 
 ## Features
 
@@ -44,7 +46,7 @@ cd Revelio
 
 ## Configuration
 
-Start with **Default**. **Precise** asks for stronger evidence, **Sweep** is broader, and **Everything** shows supported candidates within the scan and report limits. The tolerance preference is stored locally. Reports stay in document memory until cleared, replaced, or the page navigates or reloads. Export happens only on request. No backend, accounts, credentials, or AI service are required. [Scanning and privacy details](docs/scanning.md) · [Published privacy policy](https://anton.grachev.us/Revelio/privacy.html)
+Start with **Default**. **Precise** asks for stronger evidence, **Sweep** is broader, and **Everything** shows supported candidates within the scan and report limits. The tolerance preference is stored locally. Reports stay in document memory until cleared, replaced, or the page navigates or reloads. Export happens only on request. No backend, accounts, credentials, or AI service are required. [Scanning and privacy details](docs/scanning.md) · [Privacy policy](PRIVACY.md)
 
 ## Testing
 
@@ -72,6 +74,6 @@ Findings are heuristics and can include legitimate accessibility text or hidden 
 
 ## Versioning and credits
 
-This source prepares the unreleased `v1.0.1` patch. The application version lives in `manifest.json` and is mirrored in `package.json` and `package-lock.json`. Versions follow [Semantic Versioning](https://semver.org/), with `vX.Y.Z` used in release labels. See the [changelog](CHANGELOG.md).
+This source prepares the `v1.0.2` patch. The application version lives in `manifest.json` and is mirrored in `package.json` and `package-lock.json`. Versions follow [Semantic Versioning](https://semver.org/), with `vX.Y.Z` used in release labels. See the [changelog](CHANGELOG.md).
 
 Created by Anton Grachev and distributed under the [MIT license](LICENSE). Use [GitHub Issues](https://github.com/ant0n-grachev/Revelio/issues) to report a bug with a minimal, non-sensitive example.
