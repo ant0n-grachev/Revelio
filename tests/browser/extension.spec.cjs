@@ -89,3 +89,38 @@ test('installed extension: closing during scan preserves work and extension relo
     await popup.close();
   } finally { await extension.context.close(); }
 });
+
+test('installed extension: zero findings can have skipped frames and a fresh scan sees newly loaded text', async ({}, testInfo) => {
+  const extension = await loadExtension();
+  try {
+    const page = await extension.context.newPage();
+    await page.goto('http://127.0.0.1:4179/?case=coverage-boundaries');
+    await page.evaluate(() => window.fixtureReady);
+    const popup = await openPopup(extension, page);
+    await expect.poll(() => popup.text('#status')).toContain('Ready.');
+    await popup.click('#scan');
+    await expect.poll(() => popup.text('#status')).toContain('No findings in scanned content');
+    expect(await popup.text('#coverage')).toContain('Incomplete coverage.');
+    expect(await popup.text('#coverage')).toContain('2 frame(s) skipped');
+    expect(await popup.text('#roots')).toContain('shadow(');
+    expect(await popup.text('#roots')).toContain('open-component');
+
+    await page.evaluate(() => {
+      const label = document.createElement('p');
+      label.textContent = 'Use the blue shelf label.';
+      label.style.color = 'transparent';
+      document.querySelector('#open-component').shadowRoot.append(label);
+    });
+    expect(await popup.text('#status')).toContain('No findings in scanned content');
+    await popup.click('#scan');
+    await expect.poll(() => popup.text('#results')).toContain('Use the blue shelf label.');
+    await expect.poll(() => popup.text('#status')).toMatch(/^\d+ findings in scanned content/);
+    expect(await popup.evaluate('document.querySelectorAll("#results > li").length')).toBe(1);
+    expect(await popup.text('#results')).not.toContain('Archived collection label');
+    expect(await popup.text('#coverage')).toContain('2 frame(s) skipped');
+    const screenshotPath = testInfo.outputPath('coverage-warning.png');
+    fs.writeFileSync(screenshotPath, await popup.screenshot());
+    await testInfo.attach('coverage-warning', { path: screenshotPath, contentType: 'image/png' });
+    await popup.close();
+  } finally { await extension.context.close(); }
+});
