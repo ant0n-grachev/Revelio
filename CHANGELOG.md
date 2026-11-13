@@ -11,6 +11,10 @@ The source prepares `v1.0.1`.
 - Added Chromium checks for benign hidden UI text, multilingual text with visual concealment signals, and the installed extension’s coverage warning and rescan behavior.
 - Check that the Chrome manifest and npm metadata agree on the application version.
 
+### Changed
+
+- Clarified installation, permissions, coverage limits, and verification in the README and linked documentation.
+
 ### Fixed
 
 - Use singular and plural count labels in the popup so findings and coverage warnings read clearly.

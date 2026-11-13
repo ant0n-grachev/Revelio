@@ -77,7 +77,7 @@ npm run test:browser
 
 Browser fixtures use port **4179** with `127.0.0.1` and `localhost` as distinct origins for real same-origin/cross-origin cases. The suite includes default-budget fixtures plus reduced work limits in explicitly instrumented test copies for deterministic boundary tests; no test controls are exposed by the shipped scanner. Traces/screenshots on failure can contain fixture text. CI runs the same checks under Xvfb and uploads failure artifacts.
 
-For an unpacked installation, only `manifest.json`, `icon128.png`, `popup.html`, `popup.js`, `protocol.js`, `content.js`, `detection.js`, `retention.js`, and `privacy.html` are needed. `npm run check` verifies these files, JavaScript syntax, packaged popup scripts, and the unchanged permission list. There is no production build step.
+For an unpacked installation, only `manifest.json`, `icon128.png`, `popup.html`, `popup.js`, `protocol.js`, `content.js`, `detection.js`, `retention.js`, and `privacy.html` are needed. `npm run check` verifies these files, JavaScript syntax, packaged popup scripts, the permission list, and version consistency between the Chrome manifest and both npm metadata files. There is no production build step.
 
 ## Implementation and evidence
 
@@ -89,3 +89,11 @@ For an unpacked installation, only `manifest.json`, `icon128.png`, `popup.html`,
 - `.github/workflows/test.yml`: verification in CI.
 
 Browser behavior references: [Chrome activeTab](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab), [isolated content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts), [tab messaging](https://developer.chrome.com/docs/extensions/reference/api/tabs), [iframe contentDocument](https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/contentDocument), and [Canvas fillStyle](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle).
+
+## Research
+
+- Greshake and colleagues demonstrated how instructions embedded in retrieved content can redirect AI applications. [Indirect prompt injection research, 2023](https://arxiv.org/abs/2302.12173)
+- Unit 42 documented web-based prompt injection incidents involving visually hidden text. [In-the-wild observations](https://unit42.paloaltonetworks.com/ai-agent-prompt-injection/)
+- OpenAI describes how it tests and hardens a browser agent against prompt injection. [Atlas security research, 2025](https://openai.com/index/hardening-atlas-against-prompt-injection/)
+
+These sources describe observed examples. Revelio checks for suspicious text and visual signals, and the research does not establish the prevalence of those signals across the web.
