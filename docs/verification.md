@@ -1,26 +1,31 @@
-# Verification — 2026-09-07
+# Verification
 
-Final local verification used Node.js 22.22.0 and Playwright 1.62.1 / Chromium 151.0.7922.34 on macOS.
+## Automated checks
 
-| Command | Actual final result |
+The November 12, 2026 run used Node.js 22.22.0 and Playwright 1.62.1 with Chromium 151.0.7922.34 on macOS 27.0.1 (Apple silicon).
+
+| Check | Passed | Failed | Skipped |
+| --- | ---: | ---: | ---: |
+| `npm run check` | 9 packaged files, manifest permissions, syntax, and version agreement | 0 | 0 |
+| `npm run test:unit` | 39 | 0 | 0 |
+| `npm run test:browser` | 30, including 3 installed-extension checks | 0 | 0 |
+
+The [September 7 baseline](https://github.com/ant0n-grachev/Revelio/commit/ee0f52b3f28b4d0d5e53c3bff4393c8dec1abb6e) passed 38 unit and 28 Chromium tests locally. [The baseline also passed on GitHub Actions under Linux/Xvfb](https://github.com/ant0n-grachev/Revelio/actions/runs/34169152214). See the [testing commands and setup](scanning.md#development-and-verification).
+
+## What the browser tests exercise
+
+- **Installed extension.** Chromium loads the unpacked manifest, triggers the toolbar action for an `activeTab` grant, and exercises the actual popup, injection, and messages. Checks cover literal rendering, highlights, tab isolation, restricted pages, report retention across popup closure, cleanup, and temporary unload/reload. A local page verifies that an empty report can have inaccessible frames, that open and closed shadow roots have different coverage, and that text added after a scan requires a fresh scan.
+- **Browser fixtures.** Other tests run the scanner in Chromium with a simulated extension transport. They check cooperative traversal, cancellation, work and result limits, CSS and Unicode evidence, root changes, stale scan rejection, and how the same scan modes treat routine hidden UI and visually concealed sample text in different languages. Selected boundary tests reduce limits in a test copy only. The detection fixtures measure behavior on known examples and do not measure real-world detection accuracy.
+
+## Fixture measurements
+
+| Fixture | November 12, 2026 observation |
 | --- | --- |
-| `npm test` | Exit 0: syntax/manifest/packaging check passed for 9 extension files; 38 Node unit tests passed; 28 browser tests passed in 21.9 seconds. |
-| `npm run check` | Passed independently and as part of `npm test`; original `activeTab`/`scripting` permissions unchanged. |
-| `npm run test:unit` | 38 passed independently and as part of `npm test`. |
-| `git diff --check` | Passed. |
-| `graphify update .` | Local code graph refreshed per workspace instructions; generated output is ignored. |
+| 10,000 visible spans | 20,006 nodes visited in 1,072 ms, 491 timer callbacks during work, complete coverage, zero findings |
+| More than 120,000 empty elements | 120,000 nodes visited in 5,564 ms, explicit `node-budget` stop and incomplete coverage |
 
-The browser suite includes two real unpacked-extension tests with the unchanged manifest: actual toolbar action and activeTab grant, production injection and messaging, literal extension-popup rendering, nested roots, correct tab/scan retention, popup closure during work, clear, restricted-page errors, and temporary extension unload/reload. Other real-browser fixtures use a mocked extension transport to inspect scanner responses; reduced work-limit tests modify private constants only in explicit test copies. The shipped scanner has no test controls.
+The September 7 cooperative runs took 967 ms and 5,338 ms respectively. The older [synchronous reproduction](../tests/baseline-notes.md) took 159 ms on the visible-span fixture. Cooperative traversal allows other page work while scanning. These timings are observations from local fixtures and vary by page, browser, and machine.
 
-Final measured fixtures:
+## Coverage limits
 
-- 10,000 ordinary visible spans: 20,006 visited nodes, 967 ms elapsed, 491 timer callbacks during work, complete coverage, zero findings.
-- More than 120,000 empty elements: 120,000 visited nodes, 5,338 ms elapsed, explicit `node-budget` stop and incomplete coverage.
-
-The [baseline observations](../tests/baseline-notes.md) measured the old synchronous 10,000-span scan at 159 ms. Cooperative work took longer elapsed time in these local runs and allowed other page tasks to run. These measurements are not a speedup claim or a guarantee for other pages/machines.
-
-The reproduction targets were confirmed on the starting working tree, with one qualification: root labels and highlighting had already improved since the cited review. Identical host/frame IDs and snippets still reproduced incorrect merging; the fixtures now verify element/root identity rather than selector uniqueness. The final review additionally caught and fixed document-title noise, direct shadow-root text, relative/ancestor vertical displacement, and pseudo-element host opacity.
-
-Remaining limits: closed roots cannot be inspected or reliably enumerated; inaccessible frames and restricted pages remain inaccessible; generated-content geometry, complex background composition, language context, and changing DOMs remain heuristic. Reports are document-local and transient. Extension unload/reload can orphan decorative nodes; automatic cleanup across invalidated extension contexts is not verified or claimed, and reloading the webpage clears them. The pagehide cache-discard handler is browser-tested with a persisted pagehide event; browser-specific back/forward-cache eligibility is not assumed. GitHub Actions/Linux/Windows execution has not been verified in this local run.
-
-Final diff review checked owned-reference cleanup, scan-scoped state, listener lifecycle, literal rendering, message identities, and unchanged permissions. At the end of implementation verification, no push, publish, deployment, or production data operation had been performed. The user subsequently authorized committing and pushing the changes to GitHub; store publication and deployment remain outside that authorization.
+The November 12 run covers desktop Chromium on macOS. The suite exercises a synthetic persisted `pagehide` event without establishing browser-specific back/forward-cache eligibility. Extension reload can leave decorative highlights on the page until the page is reloaded. Read the [scanner’s coverage limits](scanning.md#detection-and-coverage-limitations) when interpreting an empty or partial report.

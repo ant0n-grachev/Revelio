@@ -113,26 +113,31 @@
     return node;
   }
 
+  function counted(count, label) {
+    return `${count} ${label}${count === 1 ? '' : 's'}`;
+  }
+
   function render(envelope) {
     current = envelope;
     const report = envelope.report;
     const coverage = report.coverage;
     const running = report.status === 'running';
+    const findingsCount = counted(report.findings.length, 'finding');
     if (report.status === 'idle') setStatus('Ready. Start a scan of this page.');
-    else if (running) setStatus(`Scanning (${report.mode})… ${report.findings.length} findings retained so far.`);
-    else if (report.status === 'cancelled') setStatus(`Scan cancelled. ${report.findings.length} findings in the content inspected.`);
+    else if (running) setStatus(`Scanning (${report.mode})… ${findingsCount} retained so far.`);
+    else if (report.status === 'cancelled') setStatus(`Scan cancelled. ${findingsCount} in the content inspected.`);
     else if (report.status === 'error') setStatus(`Scan failed: ${report.error || 'The page changed or scanning was interrupted.'}`);
     else if (report.findings.length === 0) setStatus(`No findings in scanned content (${report.mode}).`);
-    else setStatus(`${report.findings.length} findings in scanned content (${report.mode}).`);
+    else setStatus(`${findingsCount} in scanned content (${report.mode}).`);
 
     ui.coverage.hidden = report.status === 'idle';
     ui.coverage.classList.toggle('warning', !coverage.complete || coverage.skippedFrames > 0);
     let description = running ? 'Scan in progress; coverage is partial.' :
       coverage.complete ? 'All discovered accessible roots were scanned.' : 'Incomplete coverage.';
     if (coverage.stopReason) description += ` Stop reason: ${coverage.stopReason}.`;
-    if (coverage.skippedFrames) description += ` ${coverage.skippedFrames} frame(s) skipped; their content was not inspected.`;
-    description += ` ${coverage.visitedNodes} nodes visited in ${Math.round(coverage.elapsedMs)} ms.`;
-    if (coverage.omitted) description += ` ${coverage.omitted} additional eligible finding(s) omitted from the retained report; this result limit does not stop traversal.`;
+    if (coverage.skippedFrames) description += ` ${counted(coverage.skippedFrames, 'frame')} skipped and left uninspected.`;
+    description += ` ${counted(coverage.visitedNodes, 'node')} visited in ${Math.round(coverage.elapsedMs)} ms.`;
+    if (coverage.omitted) description += ` ${counted(coverage.omitted, 'additional eligible finding')} omitted from the retained report; this result limit does not stop traversal.`;
     ui.coverage.textContent = description;
     ui['root-details'].hidden = coverage.roots.length === 0;
     const rootItems = coverage.roots.map(root => element('li',

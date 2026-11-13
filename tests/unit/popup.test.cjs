@@ -82,6 +82,18 @@ test('renders report text literally and uses top-frame extension messages', asyn
   assert.equal(h.persisted.length, 0, 'finding text is not stored');
 });
 
+test('uses singular count labels when one finding, frame, or node is reported', async () => {
+  const complete = addFinding(report('complete', 'scan-1'));
+  Object.assign(complete.report.coverage, { complete: false, skippedFrames: 1, visitedNodes: 1, omitted: 1 });
+  complete.report.coverage.roots.push({ id: 'root-2', source: 'frame', status: 'unavailable' });
+  const h = harness(complete);
+  await flush();
+  assert.match(h.nodes.status.textContent, /^1 finding in scanned content/);
+  assert.match(h.nodes.coverage.textContent, /1 frame skipped/);
+  assert.match(h.nodes.coverage.textContent, /1 node visited/);
+  assert.match(h.nodes.coverage.textContent, /1 additional eligible finding omitted/);
+});
+
 test('stale poll cannot restore findings after Clear', async () => {
   const h = harness(addFinding(report('running', 'scan-1')));
   await flush();

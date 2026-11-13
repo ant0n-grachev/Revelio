@@ -68,6 +68,17 @@ switch (parameters.get('case')) {
     frame(fixture, '/frame?name=opaque', '');
     frame(fixture, `http://localhost:${location.port}/frame?name=cross-origin`);
     break;
+  case 'coverage-boundaries': {
+    const openHost = document.createElement('div');
+    openHost.id = 'open-component';
+    openHost.attachShadow({ mode: 'open' }).textContent = 'Museum archive';
+    const closedHost = document.createElement('div');
+    add('<span style="color:transparent">Archived collection label</span>', closedHost.attachShadow({ mode: 'closed' }));
+    fixture.append(openHost, closedHost);
+    frame(fixture, '/frame?name=opaque', '');
+    frame(fixture, `http://localhost:${location.port}/frame?name=cross-origin`);
+    break;
+  }
   case 'large':
     for (let i = 0; i < Number(parameters.get('count') || 100000); i++) add(`<span>Ordinary visible text ${i}</span>`);
     break;

@@ -173,6 +173,32 @@ test('opaque sandbox and real cross-origin frames are reported as skipped', asyn
   expect(report.coverage.roots.filter(root => ['unavailable', 'inaccessible'].includes(root.status))).toHaveLength(2);
 });
 
+test('modes distinguish routine hidden UI from strong visual evidence across languages', async ({ page }) => {
+  await openFixture(page, 'ordinary');
+  await page.locator('#fixture').evaluate(fixture => {
+    fixture.innerHTML = `
+      <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Opens the help panel</span>
+      <p hidden>Advanced search options</p>
+      <p>Use the blue shelf label.</p>
+      <p style="color:transparent;font-size:3px">Set the empty box by the door.</p>
+      <p lang="es" style="color:transparent;font-size:3px">Deja la caja vacía junto a la puerta.</p>
+      <p lang="ja" style="color:transparent;font-size:3px">空の箱をドアの横に置いてください。</p>`;
+  });
+  await installScanner(page);
+  const routine = ['Opens the help panel', 'Advanced search options'];
+  const visuallyHidden = ['Set the empty box', 'Deja la caja vacía', '空の箱をドアの横'];
+  const { report: broad } = await scan(page, 'everything');
+  for (const text of [...routine, ...visuallyHidden]) expect(finding(broad, text), text).toBeTruthy();
+  for (const mode of ['default', 'precise']) {
+    const { report } = await scan(page, mode);
+    for (const text of routine) expect(finding(report, text), text).toBeUndefined();
+    for (const text of visuallyHidden) {
+      expect(finding(report, text)?.evidence.map(rule => rule.id)).toEqual(expect.arrayContaining(['font-tiny', 'color-alpha']));
+    }
+    expect(finding(report, 'Use the blue shelf label.')).toBeUndefined();
+  }
+});
+
 test('removed frames and shadow roots during a cooperative scan do not crash', async ({ page }) => {
   await openFixture(page, 'roots'); await installScanner(page);
   await page.evaluate(() => {
