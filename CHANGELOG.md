@@ -7,3 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 ### Added
 
 - Added Chromium checks for benign hidden UI text, multilingual text with visual concealment signals, and the installed extension’s coverage warning and rescan behavior.
+
+### Fixed
+
+- Use singular and plural count labels in the popup so findings and coverage warnings read clearly.

@@ -75,7 +75,7 @@ test('installed extension: closing during scan preserves work and extension relo
     expect(pending.report.status).toBe('running');
     await popup.close();
     popup = await openPopup(extension, page);
-    await expect.poll(() => popup.text('#status')).toContain('findings in scanned content');
+    await expect.poll(() => popup.text('#status')).toContain('1 finding in scanned content');
     expect(await popup.text('#results')).toContain('Retained while popup closed');
     const completed = await popup.evaluate('(async()=>{const [tab]=await chrome.tabs.query({active:true,currentWindow:true});return chrome.tabs.sendMessage(tab.id,{type:"GET_REPORT"},{frameId:0})})()');
     expect(completed.scanId).toBe(pending.scanId);
@@ -101,7 +101,7 @@ test('installed extension: zero findings can have skipped frames and a fresh sca
     await popup.click('#scan');
     await expect.poll(() => popup.text('#status')).toContain('No findings in scanned content');
     expect(await popup.text('#coverage')).toContain('Incomplete coverage.');
-    expect(await popup.text('#coverage')).toContain('2 frame(s) skipped');
+    expect(await popup.text('#coverage')).toContain('2 frames skipped');
     expect(await popup.text('#roots')).toContain('shadow(');
     expect(await popup.text('#roots')).toContain('open-component');
 
@@ -114,10 +114,10 @@ test('installed extension: zero findings can have skipped frames and a fresh sca
     expect(await popup.text('#status')).toContain('No findings in scanned content');
     await popup.click('#scan');
     await expect.poll(() => popup.text('#results')).toContain('Use the blue shelf label.');
-    await expect.poll(() => popup.text('#status')).toMatch(/^\d+ findings in scanned content/);
+    await expect.poll(() => popup.text('#status')).toContain('1 finding in scanned content');
     expect(await popup.evaluate('document.querySelectorAll("#results > li").length')).toBe(1);
     expect(await popup.text('#results')).not.toContain('Archived collection label');
-    expect(await popup.text('#coverage')).toContain('2 frame(s) skipped');
+    expect(await popup.text('#coverage')).toContain('2 frames skipped');
     const screenshotPath = testInfo.outputPath('coverage-warning.png');
     fs.writeFileSync(screenshotPath, await popup.screenshot());
     await testInfo.attach('coverage-warning', { path: screenshotPath, contentType: 'image/png' });
