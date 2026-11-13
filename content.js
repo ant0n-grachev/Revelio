@@ -228,9 +228,9 @@
                 try {
                   const frameDoc = node.contentDocument;
                   if (frameDoc?.documentElement) addRoot(frameDoc, `${entry.record.id} > frame(${cssPath(node)})`, node, entry);
-                  else skippedFrame(node, 'unavailable', 'Frame document unavailable: it may be cross-origin, sandboxed, loading, or detached; the browser did not expose the reason.');
+                  else skippedFrame(node, 'unavailable', 'Frame document unavailable: it may be cross-origin, sandboxed, loading, or detached. The browser did not expose the reason.');
                 } catch {
-                  skippedFrame(node, 'inaccessible', 'Browser denied frame access; its content was not inspected.');
+                  skippedFrame(node, 'inaccessible', 'The browser denied access to the frame, so the scan skipped it.');
                 }
               }
               for (const pseudo of ['::before', '::after']) {
@@ -256,7 +256,7 @@
           if (entry.record.status === 'scanning' && !coverage.stopReason && !job.cancelled) entry.record.status = 'scanned';
         } catch {
           entry.record.status = 'interrupted';
-          entry.record.detail = 'Root became unavailable or could not be inspected; other accessible roots were still attempted.';
+          entry.record.detail = 'This root became unavailable or could not be inspected. The scan still tried the other accessible roots.';
         }
       }
       if (job.cancelled) coverage.stopReason = 'cancelled';

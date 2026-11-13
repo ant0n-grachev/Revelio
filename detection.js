@@ -217,11 +217,11 @@
       }
     }
     const messages = {
-      'unicode-joiner-diagnostic': 'Unicode joiner or word separator in a common emoji/language context; diagnostic only',
-      'unicode-invisible': 'Invisible formatting character outside a recognized common context; usage may be legitimate',
-      'unicode-bidi': 'Directional formatting controls; may support legitimate bidirectional text',
+      'unicode-joiner-diagnostic': 'Unicode joiner or word separator in a common emoji or language context (diagnostic only)',
+      'unicode-invisible': 'Invisible formatting character outside a recognized common context. Usage may be legitimate',
+      'unicode-bidi': 'Directional formatting controls may support legitimate bidirectional text',
     };
-    return [...groups].map(([id, group]) => ({ id, description: messages[id], message: `${messages[id]} (${[...group.codePoints].join(', ')}; x${group.count})`,
+    return [...groups].map(([id, group]) => ({ id, description: messages[id], message: `${messages[id]} (${[...group.codePoints].join(', ')}, x${group.count})`,
       count: group.count, codePoints: [...group.codePoints] }));
   }
 
@@ -306,7 +306,7 @@
     const fg = resolveColor(style.color, el, context);
     const fillValue = style.webkitTextFillColor || style.getPropertyValue?.('-webkit-text-fill-color');
     const fill = fillValue ? resolveColor(fillValue, el, context) : fg;
-    if (!fg || !fill) add('color-unknown', 'Foreground color could not be resolved; contrast is unknown');
+    if (!fg || !fill) add('color-unknown', 'Contrast is unknown because the foreground color could not be resolved');
     if (fg && fg.a <= .08 && fill && fill.a <= .08) add('color-alpha', `text color alpha low (${fg.a.toFixed(2)})`, { alpha: fg.a });
     if (fill && fill.a <= .08 && (!fg || fg.a > .08)) add('fill-alpha', `-webkit-text-fill-color alpha low (${fill.a.toFixed(2)})`, { alpha: fill.a });
     const ancestors = ancestorInfo(el, context, Boolean(pseudo));

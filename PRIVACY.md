@@ -26,7 +26,7 @@ The scanned page content is processed **locally on your device** to generate:
 
 Revelio does not store your scanned page content on external servers or in extension storage. The latest report and finding references stay only in the current webpage document's extension content-script memory.
 
-Closing the popup lets a running scan finish. Reopening it on the same document retrieves that report. Clear, rescanning, navigation, page reload, or browser termination discards it. Extension reload or update can invalidate access to existing state; reload the webpage if needed.
+Closing the popup lets a running scan finish. Reopening it on the same document retrieves that report. Clear, rescanning, navigation, page reload, or browser termination discards it. Extension reload or update can invalidate access to existing state. Reload the webpage if needed.
 
 Only the selected tolerance mode is saved locally. Revelio does not automatically scan or observe webpages, and does not use telemetry, a backend, or an AI service.
 

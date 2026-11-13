@@ -146,7 +146,7 @@
     ui.coverage.textContent = description;
     ui['root-details'].hidden = coverage.roots.length === 0;
     const rootItems = coverage.roots.map(root => element('li',
-      `${root.id} · ${root.source}: ${root.status}${root.detail ? ` — ${root.detail}` : ''}`));
+      `${root.id} · ${root.source}: ${root.status}${root.detail ? `. ${root.detail}` : ''}`));
     ui.roots.replaceChildren(...rootItems);
 
     const findings = report.findings.map((finding, index) => {

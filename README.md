@@ -74,6 +74,6 @@ Findings are heuristics and can include legitimate accessibility text or hidden 
 
 ## Versioning and credits
 
-This source prepares the `v1.0.3` patch. The application version lives in `manifest.json` and is mirrored in `package.json` and `package-lock.json`. Versions follow [Semantic Versioning](https://semver.org/), with `vX.Y.Z` used in release labels. See the [changelog](CHANGELOG.md).
+This source prepares the `v1.0.4` patch. The application version lives in `manifest.json` and is mirrored in `package.json` and `package-lock.json`. Versions follow [Semantic Versioning](https://semver.org/), with `vX.Y.Z` used in release labels. See the [changelog](CHANGELOG.md).
 
 Created by Anton Grachev and distributed under the [MIT license](LICENSE). Use [GitHub Issues](https://github.com/ant0n-grachev/Revelio/issues) to report a bug with a minimal, non-sensitive example.
